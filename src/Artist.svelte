@@ -1,34 +1,52 @@
 <script lang="ts">
 
-	console.log('artistload')
-	export let ws :WebSocket
+export let ws :WebSocket
+	export let send: Function
+	send({
+		role: 'artist',
+	})
 
-	let el :HTMLElement
+	let poll
+	let responses
+
+
 	ws.onmessage = (event) => {
 		const payload = JSON.parse(event.data.toString())
-		if(payload.cmd.keepalive) return
+		if(payload.keepalive) return
 		console.log('payload', payload)
 
-		Object.entries(payload).forEach(([cmd, data]: [string, {}]) => {
+		Object.entries(payload).forEach(([cmd, data]: [string, any]) => {
 			switch(cmd) {
-				case 'question':
-					console.log('question', data)
-
+				case 'poll':
+					poll = data
+				break
+				case 'responses':
+					responses = []
+					for(let response of data){
+						const [[studentId, studentResponse]] :any = Object.entries(response)
+						console.log('response', studentId, studentResponse)
+						responses[studentResponse] = (responses[studentResponse] || 0) +1
+					}
 				break
 				default:
 					console.warn('Unknown command', payload)
 			}
 		})
+
 	}
 
 
 </script>
 
 	
-<h1>Welcome to Artist!</h1>
+<h2>Welcome, Artist 🎨🖌️</h2>
 
-<p id="server-time"></p>
-
+<h3>{poll?.question || 'Loading...'}</h3>
+<ul>
+	{#each poll?.answers || [] as answer}
+	<li>{answer}<span>{responses?.[answer] ? ': '+responses[answer] : ''}</span></li>
+	{/each}
+</ul>
 
 <style>
 </style>

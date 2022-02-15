@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://unpkg.com/papercss@1.8.3/dist/paper.min.css">
+
 <script lang="ts">
 
 	import Student from './Student.svelte'
@@ -12,36 +14,53 @@
 	console.log('host', host)
 
 	let ws = new WebSocket(host)
-	let send = (ob :{}) => {
-		console.log('sending...', ob)
-		ws.send(JSON.stringify(ob))
+	ws.onopen = (event) => {
+		console.log('opened', event)
 	}
-	// let el :HTMLElement
-	// ws.onmessage = (event) => {
-	// 	el = document.getElementById('server-time')
-	// 	el.innerHTML = 'Server time: ' + event.data
-	// }
-
-	// import { init } from './timer'
-	// const counter = init()
-	
-
+	let send = (ob :{}) => { 
+		// Send only once websocket is open, so that sub Component can call this on init
+		if(ws.readyState === WebSocket.OPEN) {
+			ws.send(JSON.stringify(ob))
+		}
+		else {
+			setTimeout(() => send(ob), 100)
+		}
+	}
 
 
 </script>
 
-<h1>Welcome to LiLsock!</h1>
+<div id="container">
+	<h1>LiLsock</h1>
 
-<select bind:value={pageSelected}>
-	{#each pages as option}
-		<option value={option}>{option.name}</option>
-	{/each}
-</select>
+	<select bind:value={pageSelected}>
+		{#each pages as option}
+			<option value={option}>{option.name}</option>
+		{/each}
+	</select>
 
-<svelte:component this={pageSelected.component} ws={ws} send={send} />
-	
-
-<!-- <p id="server-time"></p> -->
+	<svelte:component this={pageSelected.component} ws={ws} send={send} />
+</div>
 
 <style>
+	#container {
+		padding: 0px;
+		padding-left: 20px;
+	}
+	#container h1{
+		margin: 0;
+		font-size: 4rem;
+	}
+
+	#container select{
+		position:absolute;
+		top: 20px;
+		right: 20px;
+	}
+
+	:global h2 {
+		margin: 0px;
+	}
+
+
 </style>

@@ -1,17 +1,13 @@
 <script lang="ts">
 
-	console.log('studentload')
 	export let ws :WebSocket
 	export let send: Function
+	send({
+		role: 'student',
+	})
 
-	ws.onopen = (event) => {
-		console.log('opened', event)
-		send({
-			role: 'student',
-		})
-	}
+	let poll
 
-	let el :HTMLElement
 	ws.onmessage = (event) => {
 		const payload = JSON.parse(event.data.toString())
 		if(payload.keepalive) return
@@ -22,24 +18,42 @@
 				case 'poll':
 					console.log('poll', data)
 
+					poll = data
+
 				break
 				default:
 					console.warn('Unknown command', payload)
 			}
 		})
 
-		// el = document.getElementById('server-time')
-		// el.innerHTML = 'Server time: ' + event.data
 	}
+
+	let selected
+
+	$: console.log('Updated options:', poll?.answers)
+	$: console.log('Changed selected:', selected)
+	$: send({
+		response: selected,
+	})
+	
+
 
 </script>
 
 <svelte/>
 	
-<h1>Welcome to Student!</h1>
+<h2>Welcome, Student 📚</h2>
 
-<p id="server-time"></p>
+<h3>{poll?.question || 'Loading...'}</h3>
 
+<fieldset class="form-group">
+	{#each poll?.answers || [] as answer}
+		<label class="paper-radio">
+			<input type="radio" bind:group={selected} value={answer} />
+			<span>{answer}</span>
+		</label>
+	{/each}
+</fieldset>
 
 <style>
 </style>

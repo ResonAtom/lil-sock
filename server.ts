@@ -18,11 +18,13 @@ let students = new Map<string, {}>() // ws.id, data
 let artists = new Map<string, {}>() // ws.id, data
 
 type Poll = {
+	id :number,
 	question :string
 	answers :string[]
 }
-let polls :Poll[] = []
-polls.push({
+let polls :Map<number, Poll> = new Map()
+polls.set(0, {
+	id: 0,
 	question: 'What is your favorite food group?',
 	answers: [
 		'Dairy',
@@ -32,7 +34,8 @@ polls.push({
 		'Bread',
 	]
 })
-polls.push({
+polls.set(1, {
+	id: 1,
 	question: 'What is the best day of the week?',
 	answers: [
 		'Monday',
@@ -47,7 +50,8 @@ polls.push({
 		'It depends what is meant by "best".',
 	]
 })
-polls.push({
+polls.set(2, {
+	id: 2,
 	question: 'How much wood would a woodchuck chuck if a woodchuck could chuck wood?',
 	answers: [
 		'1',
@@ -57,10 +61,9 @@ polls.push({
 		'361.9237001 cm³',
 	]
 })
-
-
 let currentPoll = 0
-let answers = new Map<string, number>()
+
+let responses = new Map<string, string>()
 
 
 
@@ -109,15 +112,28 @@ wss.on('connection', (ws :LilWebSocket, req) => {
 		Object.entries(payload).forEach(([cmd, data]: [string, any]) => {
 			switch(cmd) {
 				case 'role':
-					console.log('register', data)
 					if(data === 'student' || data === 'artist') {
 						ws.role = data
 						ws.send(JSON.stringify({
-							'poll': polls[currentPoll]
+							poll: polls.get(currentPoll)
 						}))
 					}
 					else {
 						console.warn('Invalid role', data)
+					}
+
+				break
+				case 'response':
+					const answer = polls.get(currentPoll).answers.find(a => a === data)
+					if(answer) {
+						responses.set(ws.id, answer)
+						const responsesSend = Array.from(responses, e => ({[e[0]]: e[1]}))
+						broadcast({
+							responses: responsesSend
+						}, 'artist')
+					}
+					else {
+						console.warn('Answer not found', data)
 					}
 
 				break
