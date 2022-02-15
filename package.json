@@ -1,0 +1,27 @@
+{
+  "name": "lilsock",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": "17"
+  },
+  "scripts": {
+    "dev": "node index.js",
+    "start": "node index.js",
+    "local": "heroku local web"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ResonAtom/lilsock.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ResonAtom/lilsock/issues"
+  },
+  "homepage": "https://github.com/ResonAtom/lilsock#readme",
+  "dependencies": {
+    "express": "^4.17.2"
+  }
+}
