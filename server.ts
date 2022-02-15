@@ -3,20 +3,13 @@ import { Server, WebSocket, type Data } from 'ws'
 import { type ClientRequest, type IncomingMessage} from 'http'
 
 // Typing
+type Role = 'student'|'artist'
 interface LilWebSocket extends WebSocket {
 	id: string
 	role: Role
 }
-type Role = 'student'|'artist'
-
-
 
 // Server logic
-
-
-let students = new Map<string, {}>() // ws.id, data
-let artists = new Map<string, {}>() // ws.id, data
-
 type Poll = {
 	id :number,
 	question :string
@@ -67,8 +60,6 @@ let responses = new Map<string, string>()
 const responsesSend = () => {
 	return Array.from(responses, e => ({[e[0]]: e[1]}))
 }
-
-
 
 // Websocket handling
 
@@ -128,7 +119,6 @@ wss.on('connection', (ws :LilWebSocket, req) => {
 					else {
 						console.warn('Invalid role', data)
 					}
-
 				break
 				case 'response':
 					const answer = polls.get(currentPoll).answers.find(a => a === data)
@@ -141,7 +131,6 @@ wss.on('connection', (ws :LilWebSocket, req) => {
 					else {
 						console.warn('Answer not found', data)
 					}
-
 				break
 				case 'advance':
 					currentPoll++
@@ -160,12 +149,15 @@ wss.on('connection', (ws :LilWebSocket, req) => {
 				case 'confetti':
 					broadcast({confetti: true})
 				break
+
 				default:
 					console.warn('Unknown command', payload)
 			}
 		})
 	})
 })
+
+// Helper functions
 
 // Send something to all clients or a role of them
 function broadcast(ob :{}, role :Role|'all' = 'all') {
@@ -181,4 +173,4 @@ setInterval(() => {
 	broadcast({
 		keepalive: true
 	})
-}, 1000)
+}, 10_000)

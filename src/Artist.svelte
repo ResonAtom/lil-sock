@@ -1,6 +1,5 @@
 <script lang="ts">
-
-export let ws :WebSocket
+	export let ws :WebSocket
 	export let send: Function
 	export let doConfetti: Function
 
@@ -11,11 +10,9 @@ export let ws :WebSocket
 	let poll
 	let responses
 
-
 	ws.onmessage = (event) => {
 		const payload = JSON.parse(event.data.toString())
 		if(payload.keepalive) return
-		console.log('payload', payload)
 
 		Object.entries(payload).forEach(([cmd, data]: [string, any]) => {
 			switch(cmd) {
@@ -33,19 +30,15 @@ export let ws :WebSocket
 				case 'confetti':
 					doConfetti()
 				break
+				
 				default:
 					console.warn('Unknown command', payload)
 			}
 		})
-
 	}
-
-
 </script>
-
 	
 <h2>Welcome, Artist 🎨🖌️</h2>
-
 <h3>Responses to "{poll?.question || 'Loading...'}"</h3>
 <ul>
 	{#each poll?.answers || [] as answer}
@@ -54,7 +47,6 @@ export let ws :WebSocket
 </ul>
 
 <p><a href="{null}" on:click={() => send({advance: true})}>Next Poll</a></p>
-
 <p><a href="{null}" on:click={() => send({confetti: true})}>Send Confetti</a></p>
 
 <style>
@@ -67,5 +59,8 @@ export let ws :WebSocket
 	}
 	ul li span {
 		font-weight: bold;
+	}
+	p a {
+		user-select: none;
 	}
 </style>

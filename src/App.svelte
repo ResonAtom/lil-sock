@@ -1,7 +1,6 @@
 <link rel="stylesheet" href="https://unpkg.com/papercss@1.8.3/dist/paper.min.css">
 
 <script lang="ts">
-
 	import confetti from 'canvas-confetti'
 	import Student from './Student.svelte'
 	import Artist from './Artist.svelte'
@@ -33,8 +32,6 @@
 			spread: 180
 		})
 	}
-
-
 </script>
 
 <div id="container">
@@ -46,7 +43,11 @@
 		{/each}
 	</select>
 
-	<svelte:component this={pageSelected.component} ws={ws} send={send} doConfetti={doConfetti} />
+	<svelte:component this={pageSelected.component} 
+		ws={ws} 
+		send={send} 
+		doConfetti={doConfetti} 
+	/>
 </div>
 
 <style>
@@ -68,6 +69,4 @@
 	:global h2 {
 		margin: 0px;
 	}
-
-
 </style>
