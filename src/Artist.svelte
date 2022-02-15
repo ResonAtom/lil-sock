@@ -2,6 +2,8 @@
 
 export let ws :WebSocket
 	export let send: Function
+	export let doConfetti: Function
+
 	send({
 		role: 'artist',
 	})
@@ -28,6 +30,9 @@ export let ws :WebSocket
 						responses[studentResponse] = (responses[studentResponse] || 0) +1
 					}
 				break
+				case 'confetti':
+					doConfetti()
+				break
 				default:
 					console.warn('Unknown command', payload)
 			}
@@ -41,12 +46,26 @@ export let ws :WebSocket
 	
 <h2>Welcome, Artist 🎨🖌️</h2>
 
-<h3>{poll?.question || 'Loading...'}</h3>
+<h3>Responses to "{poll?.question || 'Loading...'}"</h3>
 <ul>
 	{#each poll?.answers || [] as answer}
-	<li>{answer}<span>{responses?.[answer] ? ': '+responses[answer] : ''}</span></li>
+	<li><span>{responses?.[answer] ? responses[answer] : 0}: </span>{answer}</li>
 	{/each}
 </ul>
 
+<p><a href="{null}" on:click={() => send({advance: true})}>Next Poll</a></p>
+
+<p><a href="{null}" on:click={() => send({confetti: true})}>Send Confetti</a></p>
+
 <style>
+	ul li:before {
+		content: "";
+	}
+	ul li {
+		padding: 5px;
+		font-size: 24px;
+	}
+	ul li span {
+		font-weight: bold;
+	}
 </style>

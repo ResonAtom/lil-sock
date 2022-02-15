@@ -64,7 +64,9 @@ polls.set(2, {
 let currentPoll = 0
 
 let responses = new Map<string, string>()
-
+const responsesSend = () => {
+	return Array.from(responses, e => ({[e[0]]: e[1]}))
+}
 
 
 
@@ -117,6 +119,11 @@ wss.on('connection', (ws :LilWebSocket, req) => {
 						ws.send(JSON.stringify({
 							poll: polls.get(currentPoll)
 						}))
+						if(data === 'artist') {
+							ws.send(JSON.stringify({
+								responses: responsesSend()
+							}))
+						}
 					}
 					else {
 						console.warn('Invalid role', data)
@@ -127,15 +134,31 @@ wss.on('connection', (ws :LilWebSocket, req) => {
 					const answer = polls.get(currentPoll).answers.find(a => a === data)
 					if(answer) {
 						responses.set(ws.id, answer)
-						const responsesSend = Array.from(responses, e => ({[e[0]]: e[1]}))
 						broadcast({
-							responses: responsesSend
+							responses: responsesSend()
 						}, 'artist')
 					}
 					else {
 						console.warn('Answer not found', data)
 					}
 
+				break
+				case 'advance':
+					currentPoll++
+					if(currentPoll >= polls.size) {
+						currentPoll = 0
+					}
+					responses.clear()
+					broadcast({
+						responses: responsesSend()
+					}, 'artist')
+
+					broadcast({
+						poll: polls.get(currentPoll)
+					})
+				break
+				case 'confetti':
+					broadcast({confetti: true})
 				break
 				default:
 					console.warn('Unknown command', payload)

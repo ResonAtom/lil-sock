@@ -2,6 +2,7 @@
 
 <script lang="ts">
 
+	import confetti from 'canvas-confetti'
 	import Student from './Student.svelte'
 	import Artist from './Artist.svelte'
 	const pages = [
@@ -27,6 +28,12 @@
 		}
 	}
 
+	let doConfetti = () => { 
+		confetti({
+			spread: 180
+		})
+	}
+
 
 </script>
 
@@ -39,7 +46,7 @@
 		{/each}
 	</select>
 
-	<svelte:component this={pageSelected.component} ws={ws} send={send} />
+	<svelte:component this={pageSelected.component} ws={ws} send={send} doConfetti={doConfetti} />
 </div>
 
 <style>

@@ -2,11 +2,14 @@
 
 	export let ws :WebSocket
 	export let send: Function
+	export let doConfetti: Function
+
 	send({
 		role: 'student',
 	})
 
 	let poll
+	let selected
 
 	ws.onmessage = (event) => {
 		const payload = JSON.parse(event.data.toString())
@@ -16,10 +19,11 @@
 		Object.entries(payload).forEach(([cmd, data]: [string, {}]) => {
 			switch(cmd) {
 				case 'poll':
-					console.log('poll', data)
-
 					poll = data
-
+					selected = null
+				break
+				case 'confetti':
+					doConfetti()
 				break
 				default:
 					console.warn('Unknown command', payload)
@@ -28,7 +32,6 @@
 
 	}
 
-	let selected
 
 	$: console.log('Updated options:', poll?.answers)
 	$: console.log('Changed selected:', selected)
@@ -56,4 +59,8 @@
 </fieldset>
 
 <style>
+
+	fieldset label {
+		font-size: 24px;
+	}
 </style>
